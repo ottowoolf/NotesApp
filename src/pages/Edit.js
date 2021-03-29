@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Form, Container, Button } from "react-bootstrap";
-import { useParams } from "react-router-dom";
+import { useParams, useHistory } from "react-router-dom";
 
 export const Edit = ({ notes, setNotes }) => {
   const [form, setForm] = useState({
@@ -8,40 +8,33 @@ export const Edit = ({ notes, setNotes }) => {
     text: "",
     id: "",
   });
-  const { id } = useParams();
 
   useEffect(() => {
-    let index = notes.find((n) => n.id === id);
-    let selectedNote = notes[index];
-    console.log(notes[index]);
-    console.log(id);
-    console.log(selectedNote);
-    setForm(selectedNote);
-  }, [id, notes]);
-
-  const handleChange = (e) => {
-    const { value, name } = e.target;
-    setForm({ ...form, [name]: value, id });
-    console.log(form);
-  };
-
-  const saveNote = () => {
-    if (form.title.trim() !== "" || form.text.trim() !== "") {
-      setNotes((note) => {
-        // return array - with the object of /id/ modified
-        let index = note.find((n) => n.id === id);
-        let newNotes = [...note];
-        newNotes[index] = form;
-        console.log(newNotes[index]);
-        return newNotes[index];
-      });
+    setInitialValueOfForm();
+    // eslint-disable-next-line
+  }, []);
+  const setInitialValueOfForm = () => {
+    for (let note of notes) {
+      if (note.id === id) {
+        setForm({ ...note });
+        return;
+      }
     }
+  };
+  const { id } = useParams();
+  const history = useHistory();
+  const onSubmit = () => {
+    let newNotes = notes.map((note) =>
+      note.id === id ? { ...note, ...form, id } : { note }
+    );
+    setNotes(newNotes);
+    history.push("/");
   };
 
   return (
     <React.Fragment>
-      <Container>
-        <Form className='mt-3 w-50'>
+      {/* <Container>
+        
           <Form.Group controlId='formBasicEmail'>
             <Form.Control
               onChange={handleChange}
@@ -65,6 +58,31 @@ export const Edit = ({ notes, setNotes }) => {
         <Button onClick={saveNote} className='btn btn-success'>
           Save
         </Button>
+      </Container> */}
+      <Container>
+        <Form className='mt-3 w-50'>
+          <Form.Group controlId='formBasicPassword'>
+            <Form.Control
+              type='text'
+              placeholder='title'
+              name='title'
+              value={form.title}
+              onChange={({ target }) =>
+                setForm({ ...form, [target.name]: target.value })
+              }
+            />
+            <Form.Control
+              type='text'
+              placeholder='text'
+              name='text'
+              value={form.text}
+              onChange={({ target }) =>
+                setForm({ ...form, [target.name]: target.value })
+              }
+            />
+            <Button onClick={onSubmit}>Submit</Button>
+          </Form.Group>
+        </Form>
       </Container>
     </React.Fragment>
   );

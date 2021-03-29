@@ -8,7 +8,7 @@ export const Home = ({ notes, setNotes }) => {
   return (
     <React.Fragment>
       <Container>
-        <Row notes={notes} />
+        <Row notes={notes} setNotes={setNotes} />
       </Container>
       <Container className='btn-home'>
         <Link to='/add' className='btn btn-secondary home-btn m-3 '>
